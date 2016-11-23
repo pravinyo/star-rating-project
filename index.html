@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Star Rating Project</title>
+		<style>
+		
+		.rating span:before{
+		content:"\2606";
+		}
+		.rating .blank:before{
+		content:"\2605";
+		}
+		.rating{
+		font-size:26px;
+		}
+		#preview{
+		font-size:14px;
+		}
+		.btn{
+		background-color:blue;
+		border:none;
+		color:white;
+		padding:5px;
+		text-align:center;
+		text-decoration:none;
+		display:inline-block;
+		font-size:16px;
+		}
+		</style>
+	</head>
+	<body>
+		<div>
+			<img src="" id="img"/>
+			<div id="preview">
+			</div>
+		</div>
+		<div class="rating">
+		
+		</div>
+		<div id="newImage" class="btn">New Image</div>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+		<script>
+		$(document).ready(function(){
+		var newload=true;
+		var randomImage=0;
+		 $('#newImage').click(function(){
+			loadimage();
+		 });
+		 $('.rating').on('click','span',function(){
+			 if(newload)
+			 {
+				var index=$(this).index()+1;
+			 
+				 var dataString='image='+ randomImage+'&votes='+index;
+				 $('.rating span').css("color","black");
+				 $(this).prevAll().css("color","red");
+				 $(this).css("color","red");
+				 
+				 
+				 $.ajax({
+				type:"POST",
+				url:"add.php",
+				data:dataString,
+				success:function(data){
+					console.log(data);
+					newload=false;
+					$('.rating').append(' '+data['type']);
+						}
+				});
+				 
+				 console.log(index); 
+			 }
+			 
+		 });
+		 
+		 
+		 $('.rating').on('mouseenter','span',function(){
+			 
+			 $(this).toggleClass('blank');
+		 });
+		 $('.rating').on('mouseleave','span',function(){
+			 
+			 $(this).toggleClass('blank');
+		 });
+		 
+		 function loadimage(){
+			$('.rating').html('');
+			$('.rating').append('<span></span><span></span><span></span><span></span><span></span>');
+			newload=true;
+			
+			$.ajax({
+			type:"POST",
+			url:"server.php",
+			datatype:"json",
+			success:function(data){
+				console.log(data);
+				randomImage=data["id"];
+				$('#img').attr('src',data["image"]);
+				$('#preview').html('Total Votes : ' + data["votes"]+ '&nbsp;Average Votes : '+data["avg"]);
+			}
+		 });
+		 }
+		});
+		</script>
+	</body>
+</html>
